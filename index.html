@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Project</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #map {
+            min-height: 100%;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .legend img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    </style>
+
+    <script type="text/javascript" src="data1.js"></script>
+    <script type="text/javascript" src="data2.js"></script>
+</head>
+
+<body>
+<h3 style="color:red; font-weight:bold; text-align:center">Locations of Speed Cameras and Fatalities in Chicago</h3>
+<div id="map"></div>
+<div class="legend">
+    <img src="speed-radar.png" alt="Speed Radar Icon"> Speed Camera
+    <br>
+    <img src="record-button.png" alt="Record Button Icon"> Location of Fatalities
+</div>
+
+<script type="text/javascript">
+    var map = L.map('map', {
+        center: [41.881832, -87.623177],
+        zoom: 10.5
+    });
+
+    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+        attribution: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
+        maxZoom: 17,
+        minZoom: 5
+    }).addTo(map);
+
+    var customIcon = L.icon({
+        iconUrl: 'speed-radar.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+    });
+
+    var customIcon2 = L.icon({
+        iconUrl: 'record-button.png',
+        iconSize: [16, 16],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+    });
+
+    var speedCamerasLayer = L.geoJson(data1, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, { icon: customIcon });
+        }
+    });
+
+    var fatalitiesLayer = L.geoJson(data2, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, { icon: customIcon2 });
+        }
+    });
+
+    var baseLayers = {
+        "Base Map": L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
+            maxZoom: 17,
+            minZoom: 5
+        })
+    };
+
+    var overlayLayers = {
+        "Speed Cameras": speedCamerasLayer,
+        "Fatalities": fatalitiesLayer
+    };
+
+    L.control.layers(baseLayers, overlayLayers).addTo(map);
+
+    speedCamerasLayer.addTo(map); // Show the Speed Cameras layer by default
+</script>
+</body>
+</html>
